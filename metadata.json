@@ -1,0 +1,6 @@
+{
+  "name": "Umoja Pre & Primary School",
+  "description": "The official website for Umoja Pre & Primary School, a NECTA-accredited co-educational day school in Mbeya, Tanzania, featuring student admissions, interactive NECTA curriculum results analysis, school prospectus, campus news feed, and parent testimonials.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
