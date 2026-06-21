@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import React from "react";
-import { Play, FileText, Compass, Award, ShieldAlert, Sparkles } from "lucide-react";
+import { Play, FileText, Compass, Award, ShieldAlert, Sparkles, X } from "lucide-react";
 import { ADMISSION_CRITERIA, CONTACT_INFO } from "../data/schoolData";
 
 interface HeroProps {
@@ -15,6 +15,7 @@ interface HeroProps {
 
 export default function Hero({ onStartApplicationClick, onDownloadProspectusClick }: HeroProps) {
   const [isPlayingFilm, setIsPlayingFilm] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   return (
     <section id="hero-section" className="relative text-white overflow-hidden border-b border-brand-border">
@@ -26,7 +27,7 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
         ) : (
           <iframe 
             className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-105 transition-all duration-1000"
-            src="https://www.youtube.com/embed/9XvDovd_D1U?autoplay=1&mute=1&playlist=9XvDovd_D1U&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1" 
+            src="https://www.youtube.com/embed/-USKUNpg9_A?autoplay=1&mute=1&playlist=-USKUNpg9_A&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1" 
             title="Umoja School Film"
             allow="autoplay; encrypted-media"
             referrerPolicy="no-referrer"
@@ -91,14 +92,17 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
               </button>
 
               <button
-                onClick={() => setIsPlayingFilm(!isPlayingFilm)}
+                onClick={() => {
+                  setIsVideoModalOpen(true);
+                  setIsPlayingFilm(true);
+                }}
                 className="flex items-center gap-2.5 text-xs sm:text-sm font-sans font-bold text-brand-blue hover:text-brand-orange transition-colors group p-2 relative"
               >
-                <span className={`w-9 h-9 border-2 ${isPlayingFilm ? 'bg-brand-blue text-white border-brand-blue' : 'border-brand-blue bg-white text-brand-blue'} rounded-full flex items-center justify-center shadow-sm relative pulse-ring-active group-hover:border-brand-orange group-hover:text-brand-orange transition-all duration-300`}>
-                  <Play size={14} className={`${isPlayingFilm ? 'fill-current' : 'fill-none'} ml-0.5`} />
+                <span className="w-9 h-9 border-2 border-brand-blue bg-white text-brand-blue rounded-full flex items-center justify-center shadow-sm relative pulse-ring-active group-hover:border-brand-orange group-hover:text-brand-orange transition-all duration-300">
+                  <Play size={14} className="fill-none ml-0.5" />
                 </span>
                 <span className="group-hover:translate-x-1 transition-transform duration-300 font-sans">
-                  {isPlayingFilm ? "Dim School Film" : "Watch School Film"}
+                  Watch School Film
                 </span>
               </button>
             </div>
@@ -172,6 +176,30 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
         </div>
 
       </div>
+
+      {/* Interactive Video Player Modal Overlay */}
+      {isVideoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#051726]/95 backdrop-blur-lg flex items-center justify-center p-4 transition-all duration-300">
+          <div className="relative bg-black w-full max-w-4xl aspect-video rounded-xl shadow-2xl border border-white/10 overflow-hidden">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute top-4 right-4 z-10 bg-brand-dark/80 hover:bg-brand-orange text-white p-2 text-center items-center justify-center rounded-full transition-all duration-200 shadow-md cursor-pointer flex"
+              aria-label="Close Video"
+            >
+              <X size={18} />
+            </button>
+            <iframe
+              src="https://www.youtube.com/embed/-USKUNpg9_A?autoplay=1&rel=0&modestbranding=1"
+              title="Umoja School Film Web Player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              referrerPolicy="no-referrer"
+              className="w-full h-full border-0"
+            ></iframe>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
