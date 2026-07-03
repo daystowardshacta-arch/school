@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import React from "react";
 import { Play, Tv, X, Volume2 } from "lucide-react";
+import FloatingPlayer from "./FloatingPlayer";
 
 interface CampusCard {
   id: number;
@@ -15,9 +16,42 @@ interface CampusCard {
   gridClass: string;
 }
 
+const VIDEO_MAP: Record<number, string> = {
+  1: "-USKUNpg9_A", // Science Class experiments (requested video)
+  2: "-DwAVMDPUYk", // Sports & Athletics Field
+  3: "Z41Yg0P70wA", // GPS-Tracked Transport Tour
+  4: "yQ0V15_GfW0", // Creative Art Class
+  5: "7V2VpWvU0i8", // High-Nutrition Dining Program
+  6: "kYh7Cym_Y5g"  // Cozy Boarding Ward / Welfare
+};
+
 export default function CampusLife() {
-  const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const [activeVideo, setActiveVideo] = useState<{ id: string; name: string } | null>(null);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [isPlayerInView, setIsPlayerInView] = useState(true);
+  const playerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!activeVideo) {
+      setIsPlayerInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsPlayerInView(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+
+    if (playerRef.current) {
+      observer.observe(playerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [activeVideo]);
 
   const cards: CampusCard[] = [
     {
@@ -64,8 +98,9 @@ export default function CampusLife() {
     }
   ];
 
-  const handleCardClick = (name: string) => {
-    setActiveVideo(name);
+  const handleCardClick = (id: number, name: string) => {
+    const videoId = VIDEO_MAP[id] || "-USKUNpg9_A";
+    setActiveVideo({ id: videoId, name });
     setTimeout(() => {
       const hud = document.getElementById("video-hud-overlay");
       if (hud) {
@@ -99,44 +134,73 @@ export default function CampusLife() {
           </div>
         </div>
 
-        {/* Dynamic Video HUD Display */}
+        {/* Real Video Player HUD */}
         {activeVideo && (
           <div 
+            ref={playerRef}
             id="video-hud-overlay"
-            className="mb-8 p-4 bg-brand-dark text-[#F4F7FA] rounded-md border border-brand-blue/30 flex flex-col md:flex-row justify-between items-center gap-4 animate-scale-up shadow-md relative overflow-hidden"
+            className="mb-8 p-4 md:p-6 bg-brand-dark text-[#F4F7FA] rounded-lg border border-brand-orange/40 animate-scale-up shadow-2xl relative overflow-hidden flex flex-col gap-4"
           >
-            <div className="absolute right-0 top-0 bottom-0 opacity-10 flex gap-0.5 items-end p-2 pointer-events-none">
-              <div className="w-1 h-12 bg-white animate-pulse" />
-              <div className="w-1 h-8 bg-white animate-pulse" style={{ animationDelay: '0.2s' }} />
-              <div className="w-1 h-10 bg-white animate-pulse" style={{ animationDelay: '0.4s' }} />
-              <div className="w-1 h-6 bg-white animate-pulse" style={{ animationDelay: '0.1s' }} />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-brand-blue flex items-center justify-center">
-                <Volume2 size={15} />
-              </div>
-              <div className="text-left">
-                <div className="text-[9px] text-[#FFBE0B] font-bold tracking-widest uppercase font-mono">
-                  ▶ Active Live Stream
+            {/* Header Control Panel */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-brand-blue/20 pb-3 w-full">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-brand-orange/10 border border-brand-orange flex items-center justify-center text-brand-orange shrink-0 animate-pulse">
+                  <Volume2 size={15} />
                 </div>
-                <div className="text-sm font-bold font-serif text-white">
-                  Broadcasting: {activeVideo}
+                <div className="text-left">
+                  <div className="text-[9px] text-brand-orange font-bold tracking-widest uppercase font-mono">
+                    ▶ Now Playing Locally
+                  </div>
+                  <div className="text-sm font-bold font-serif text-white">
+                    {activeVideo.name}
+                  </div>
                 </div>
               </div>
+
+              <div className="flex gap-3 items-center self-end sm:self-auto">
+                <span className="text-[10px] font-mono text-white/50 bg-[#1D2E3D] px-2.5 py-1 rounded">
+                  {isPlayerInView ? "HD Local Player Feed" : "PiP Active Mode"}
+                </span>
+                <button 
+                  onClick={() => setActiveVideo(null)}
+                  className="text-white hover:text-brand-orange text-xs font-sans font-bold flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded transition-all cursor-pointer"
+                >
+                  <X size={13} />
+                  <span>Close Player</span>
+                </button>
+              </div>
             </div>
 
-            <div className="flex gap-4 items-center">
-              <span className="text-[10px] font-mono text-white/50 bg-[#1D2E3D] px-2 py-1 rounded">
-                Simulating HD Feed...
-              </span>
-              <button 
-                onClick={() => setActiveVideo(null)}
-                className="text-white hover:text-brand-orange text-xs font-sans font-bold flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded"
-              >
-                <X size={12} />
-                <span>Close Player</span>
-              </button>
+            {/* Embedded Responsive Video Player / Placeholder */}
+            <div className="w-full aspect-video md:max-w-4xl mx-auto rounded-lg overflow-hidden border border-brand-blue/20 shadow-lg bg-black relative">
+              {isPlayerInView ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${activeVideo.id}?autoplay=1&mute=0&rel=0&modestbranding=1`}
+                  title={`Umoja School Feature - ${activeVideo.name}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full border-0"
+                ></iframe>
+              ) : (
+                <div className="absolute inset-0 bg-[#051726]/95 flex flex-col items-center justify-center text-center p-6 gap-3 select-none">
+                  <div className="w-12 h-12 rounded-full border border-brand-orange/40 flex items-center justify-center text-brand-orange animate-pulse">
+                    <Volume2 size={20} className="animate-bounce" />
+                  </div>
+                  <h5 className="font-serif font-bold text-white text-base">Picture-in-Picture Mode Active</h5>
+                  <p className="text-xs text-white/60 max-w-sm">
+                    You scrolled away! The video of <strong>{activeVideo.name}</strong> is now playing in the floating movable window.
+                  </p>
+                  <button
+                    onClick={() => {
+                      playerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }}
+                    className="mt-2 text-xs font-sans font-bold bg-brand-orange text-white px-4 py-2 rounded-md hover:bg-brand-orange/80 transition-all cursor-pointer shadow-md"
+                  >
+                    Scroll back to Original Player
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -152,7 +216,7 @@ export default function CampusLife() {
                 className={`${card.gridClass} rounded-lg overflow-hidden relative cursor-pointer shadow-xs border border-brand-border group flex flex-col justify-end p-6 select-none`}
                 onMouseEnter={() => setHoveredId(card.id)}
                 onMouseLeave={() => setHoveredId(null)}
-                onClick={() => handleCardClick(card.name)}
+                onClick={() => handleCardClick(card.id, card.name)}
               >
                 {/* Background Gradient container */}
                 <div 
@@ -194,6 +258,18 @@ export default function CampusLife() {
         </div>
 
       </div>
+
+      {/* Floating Picture-in-Picture Player */}
+      {activeVideo && !isPlayerInView && (
+        <FloatingPlayer 
+          videoId={activeVideo.id}
+          title={activeVideo.name}
+          onClose={() => setActiveVideo(null)}
+          onRestore={() => {
+            playerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+        />
+      )}
     </section>
   );
 }

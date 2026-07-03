@@ -13,8 +13,11 @@ interface HeroProps {
   onDownloadProspectusClick: () => void;
 }
 
-export default function Hero({ onStartApplicationClick, onDownloadProspectusClick }: HeroProps) {
-  const [isPlayingFilm, setIsPlayingFilm] = useState(false);
+export default function Hero({ 
+  onStartApplicationClick, 
+  onDownloadProspectusClick
+}: HeroProps) {
+  const [isPlayingFilm, setIsPlayingFilm] = useState(true);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   return (
@@ -27,10 +30,11 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
         ) : (
           <iframe 
             className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-105 transition-all duration-1000"
-            src="https://www.youtube.com/embed/-USKUNpg9_A?autoplay=1&mute=1&playlist=-USKUNpg9_A&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1" 
+            src="https://www.youtube.com/embed/yo63r2hfi_s?autoplay=1&mute=1&playlist=yo63r2hfi_s&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1" 
             title="Umoja School Film"
-            allow="autoplay; encrypted-media"
-            referrerPolicy="no-referrer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
           ></iframe>
         )}
 
@@ -48,7 +52,7 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pt-12 pb-10 md:pt-16 md:pb-12 flex flex-col md:flex-row gap-8 items-stretch">
         
         {/* Left Section (Full Layout, takes ~70% width on Desktop) */}
-        <div className="flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col justify-between md:bg-white/90 md:backdrop-blur-md md:p-8 lg:p-10 md:rounded-2xl md:shadow-xl md:border md:border-white/30 transition-all duration-300">
           <div className="mb-8 md:mb-10">
             
             {/* Badge Strip */}
@@ -190,16 +194,17 @@ export default function Hero({ onStartApplicationClick, onDownloadProspectusClic
               <X size={18} />
             </button>
             <iframe
-              src="https://www.youtube.com/embed/-USKUNpg9_A?autoplay=1&rel=0&modestbranding=1"
+              src="https://www.youtube.com/embed/yo63r2hfi_s?autoplay=1&rel=0&modestbranding=1"
               title="Umoja School Film Web Player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-              referrerPolicy="no-referrer"
+              referrerPolicy="strict-origin-when-cross-origin"
               className="w-full h-full border-0"
             ></iframe>
           </div>
         </div>
       )}
+
     </section>
   );
 }

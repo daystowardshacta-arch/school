@@ -165,9 +165,9 @@ export default function StartApplicationModal({ isOpen, onClose, onSubmitCapture
                 className="w-full bg-white border border-[#EBEBEB] text-brand-dark px-3 py-3 rounded-[3px] text-xs font-sans focus:border-brand-green outline-none"
               >
                 <option value="">-- Choose level --</option>
+                <option value={ProgramType.Nursery}>{ProgramType.Nursery} (Ages 3.5–4.5)</option>
+                <option value={ProgramType.PrePrimary}>{ProgramType.PrePrimary} (Ages 4.5–5.5)</option>
                 <option value={ProgramType.Primary}>{ProgramType.Primary} (Std 1–7)</option>
-                <option value={ProgramType.OLevel}>{ProgramType.OLevel} (Form 1–4)</option>
-                <option value={ProgramType.ALevel}>{ProgramType.ALevel} (Form 5–6)</option>
                 <option value={ProgramType.SportsAndArts}>{ProgramType.SportsAndArts} (All Grades)</option>
               </select>
             </div>
